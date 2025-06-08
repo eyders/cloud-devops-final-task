@@ -1,0 +1,46 @@
+# ── Python ─────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual envs
+.venv/
+env/
+venv/
+
+# Test / coverage artefacts
+.coverage
+htmlcov/
+.pytest_cache/
+.cache/
+
+# Logs
+*.log
+
+# ── Terraform / IaC ───────────────────────────────────
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfplan
+
+# ── Kubernetes / kubeconfig ───────────────────────────
+*.kubeconfig
+
+# ── Editors / IDEs ────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*~ 
+
+# ── OS clutter ────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Archives / temp ───────────────────────────────────
+*.zip
+*.tar.gz

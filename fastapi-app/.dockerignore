@@ -1,0 +1,33 @@
+# Exclude everything that is not required to build/run the container
+# ── Python artefacts ───────────────────────────────────
+__pycache__/
+*.py[cod]
+*.so
+.eggs/
+*.egg-info/
+
+# Tests and docs
+tests/
+.coverage
+.pytest_cache/
+htmlcov/
+*.md
+*.rst
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# IDE / editor folders
+.vscode/
+.idea/
+
+# Logs & misc
+*.log
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
