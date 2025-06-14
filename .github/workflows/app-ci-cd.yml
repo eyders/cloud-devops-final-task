@@ -1,0 +1,72 @@
+name: CI/CD – FastAPI application
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "fastapi-app/**"
+      - ".github/workflows/app-ci-cd.yml"
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: fastapi-app
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  build-test-publish:
+    name: Unit tests → Build → Push
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write 
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install deps
+      working-directory: fastapi-app
+      run: |
+        pip install -r requirements.txt
+        pip install -r test-requirements.txt || true   # if you keep test deps separate
+
+    - name: Run unit tests
+      working-directory: fastapi-app
+      run: pytest -q
+
+    - name: Configure AWS credentials (OIDC)
+      id: aws-creds
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-ecr
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Capture AWS account ID
+      id: account
+      run: echo "ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> "$GITHUB_ENV"
+
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build & push Docker image
+      working-directory: fastapi-app
+      env:
+        IMAGE_TAG: ${{ github.sha }}
+        REGISTRY: ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+      run: |
+        IMAGE_URI=${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+        docker build -t "${IMAGE_URI}" .
+        docker push "${IMAGE_URI}"
+        # Optionally push :latest for convenience (keep immutable tags for prod!)
+        docker tag "${IMAGE_URI}" "${REGISTRY}/${ECR_REPOSITORY}:latest"
+        docker push "${REGISTRY}/${ECR_REPOSITORY}:latest"
+
+    - name: Post image URI as output (for later steps/workflows)
+      run: echo "image-uri=${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
