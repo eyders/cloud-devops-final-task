@@ -51,7 +51,7 @@ module "eks_aws_auth" {
   # Defines the roles, users, or accounts to be mapped in the `aws-auth` ConfigMap.
   aws_auth_roles = [
     {
-      rolearn  = aws_iam_role.github_actions_ecr.arn
+      rolearn  = var.github_action_ecr_arn #aws_iam_role.github_actions_ecr.arn
       username = "github-actions"
       groups   = ["system:masters"]
     }

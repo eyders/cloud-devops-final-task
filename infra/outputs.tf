@@ -38,12 +38,3 @@ output "public_subnets" {
   value       = module.vpc.public_subnets
 }
 
-output "ecr_repo_url" {
-  description = "ECR registry/repository URL"
-  value       = aws_ecr_repository.app.repository_url
-}
-
-output "github_actions_role_arn" {
-  description = "IAM role to assume from GitHub Actions"
-  value       = aws_iam_role.github_actions_ecr.arn
-}

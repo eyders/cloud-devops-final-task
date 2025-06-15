@@ -80,3 +80,15 @@ resource "aws_iam_role_policy" "eks_describe_cluster" {
   role   = aws_iam_role.github_actions_ecr.id
   policy = data.aws_iam_policy_document.eks_describe_cluster.json
 }
+
+# IAM Role for Terraform pipeline
+resource "aws_iam_role" "github_actions_terraform" {
+  name               = "github-actions-terraform"
+  assume_role_policy = data.aws_iam_policy_document.github_assume_role.json
+}
+
+# Permissions: Define permissions with the least possible privileges
+resource "aws_iam_role_policy_attachment" "terraform_admin" {
+  role       = aws_iam_role.github_actions_terraform.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
