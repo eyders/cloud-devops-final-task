@@ -40,3 +40,27 @@ module "eks" {
     Terraform   = "true"
   }
 }
+
+module "eks_aws_auth" {
+  source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
+  version = "~> 20.0"
+
+  # Controls whether the module creates or updates the `aws-auth` ConfigMap.
+  manage_aws_auth_configmap = true
+
+  # Defines the roles, users, or accounts to be mapped in the `aws-auth` ConfigMap.
+  aws_auth_roles = [
+    {
+      rolearn  = aws_iam_role.github_actions_ecr.arn
+      username = "github-actions"
+      groups   = ["system:masters"]
+    }
+  ]
+
+  # Map kubernetes alias
+  providers = {
+    kubernetes = kubernetes.eks
+  }
+
+  depends_on = [module.eks]
+}
