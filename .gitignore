@@ -27,6 +27,7 @@ htmlcov/
 *.tfstate.*
 .terraform/
 *.tfplan
+terraform.tfvars
 
 # ── Kubernetes / kubeconfig ───────────────────────────
 *.kubeconfig

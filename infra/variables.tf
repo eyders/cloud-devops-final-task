@@ -46,8 +46,7 @@ variable "eks_version" {
   default     = "1.32"
 }
 
-variable "github_action_ecr_arn" {
+variable "github_actions_ecr_arn" {
   description = "Github action role ARN"
   type = string
-  default = ""
 }
