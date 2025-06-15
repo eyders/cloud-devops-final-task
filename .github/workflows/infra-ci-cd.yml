@@ -1,0 +1,73 @@
+name: CI/CD – Terraform infrastructure
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "infra/**"
+      - ".github/workflows/infra-ci-cd.yml"
+  pull_request:
+    paths:
+      - "infra/**"
+      - ".github/workflows/infra-ci-cd.yml"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  AWS_REGION: us-east-1
+  TF_VERSION: "1.6.6"
+  TF_VAR_github_actions_ecr_arn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-ecr
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run: { working-directory: infra }
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-terraform
+        aws-region:     ${{ env.AWS_REGION }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+        terraform_wrapper: false
+
+    # ---------- Lint / Validation ----------
+    - name: Terraform fmt
+      run: terraform fmt -recursive -check
+
+    - name: Terraform init
+      run: terraform init -input=false
+
+    - name: Terraform validate
+      run: terraform validate -no-color
+
+    # ---------- PLAN ----------
+    - name: Terraform plan
+      id: plan
+      run: terraform plan -input=false -no-color -out=tfplan
+
+    # ---------- Comment plan on PRs ----------
+    - name: Attach plan to PR
+      if: github.event_name == 'pull_request'
+      run: |
+        terraform show -no-color tfplan > plan.txt
+        gh pr comment ${{ github.event.pull_request.number }} --body-file plan.txt
+      env:
+        GH_TOKEN: ${{ github.token }}
+
+    # ---------- APPLY (only on main) ----------
+    - name: Terraform apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -input=false -auto-approve tfplan
