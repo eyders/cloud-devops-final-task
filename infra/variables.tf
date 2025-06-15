@@ -48,5 +48,5 @@ variable "eks_version" {
 
 variable "github_actions_ecr_arn" {
   description = "Github action role ARN"
-  type = string
+  type        = string
 }

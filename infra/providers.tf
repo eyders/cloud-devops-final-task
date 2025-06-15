@@ -6,11 +6,11 @@ terraform {
   required_version = ">= 1.0"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~> 5.49"
     }
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
       version = "~> 2.0"
     }
   }
@@ -31,7 +31,7 @@ provider "helm" {
 
 # Provider Kubernetes (alias "eks") to sub-módulo aws-auth
 provider "kubernetes" {
-  alias                  = "eks"
+  alias = "eks"
 
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)

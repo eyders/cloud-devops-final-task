@@ -12,7 +12,7 @@ resource "aws_ecr_lifecycle_policy" "keep_last" {
     rules = [{
       rulePriority = 10
       description  = "Expire images beyond the 10 most recent"
-      selection    = {
+      selection = {
         tagStatus   = "any"
         countType   = "imageCountMoreThan"
         countNumber = var.ecr_image_retention_count
@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "github_assume_role" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [
+      values = [
         "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/*"
       ]
     }
