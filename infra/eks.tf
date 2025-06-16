@@ -9,6 +9,13 @@ module "eks" {
   cluster_endpoint_private_access = false
 
   enable_cluster_creator_admin_permissions = false
+  
+  access_entries = {
+    gha-terraform = {
+      principal_arn = var.github_actions_terraform_arn
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    }
+  }
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids               = module.vpc.private_subnets
