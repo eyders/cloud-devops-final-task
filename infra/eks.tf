@@ -9,7 +9,7 @@ module "eks" {
   cluster_endpoint_private_access = false
 
   enable_cluster_creator_admin_permissions = false
-  
+
   access_entries = {
     gha-terraform = {
       principal_arn = var.github_actions_terraform_arn
