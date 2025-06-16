@@ -50,3 +50,8 @@ variable "github_actions_ecr_arn" {
   description = "Github action role ARN"
   type        = string
 }
+
+variable "github_actions_terraform_arn" {
+  description = "Github action role ARN for Terraform"
+  type        = string
+}
