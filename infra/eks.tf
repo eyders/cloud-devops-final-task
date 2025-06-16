@@ -41,6 +41,8 @@ module "eks" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 module "eks_aws_auth" {
   source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
   version = "~> 20.0"
@@ -53,6 +55,14 @@ module "eks_aws_auth" {
     {
       rolearn  = var.github_actions_ecr_arn #aws_iam_role.github_actions_ecr.arn
       username = "github-actions"
+      groups   = ["system:masters"]
+    }
+  ]
+
+  aws_auth_users = [
+    {
+      userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/eyder"
+      username = "eyder"
       groups   = ["system:masters"]
     }
   ]
