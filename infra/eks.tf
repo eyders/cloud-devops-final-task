@@ -22,7 +22,7 @@ module "eks" {
       capacity_type  = "ON_DEMAND"
 
       min_size     = 1
-      max_size     = 2
+      max_size     = 3
       desired_size = 1
 
       labels = {
